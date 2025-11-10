@@ -1,12 +1,12 @@
 # Test application
 
-This test application is designed to handle data import and export in an efficient way.
+This test application is designed to handle data import and export in an efficient way, supporting high-volume data processing with reliability and performance.
 
 ## Table of Contents
 
 - [Features](#features)
 - [Quick Start Docker](#quick-start-docker)
-- [Quick Start Local](#quick-start-local-and-DB-docker)
+- [Quick Start Local](#quick-start-local-and-DB)
 - [Access your api](#access-your-api)
 - [Api documentation](#api-documentation)
 - [Api postman](#api-postman)
@@ -19,9 +19,11 @@ This test application is designed to handle data import and export in an efficie
 
 ## Features
 
-- 📈 **Large Files**: Can handle large import
-- ⚡ **High Performance**: Optimized for high-throughput scenarios
-- 🎯 **Zero Message Loss**: Database-backed reliability
+- 📈 **Large File Processing:**: Efficiently handles large data imports through streaming and chunking
+- ⚡ **High Performance:**: Optimized for high-throughput scenarios with database batching
+- 🔄 **Asynchronous Processing:** Background job processing for long-running operations
+- 🎯 **Zero Message Loss**: Database-backed reliability ensures data integrity
+- 📊 **Flexible Export:** Supports various export formats and filtering options
 
 ## Quick start docker
 
@@ -71,13 +73,15 @@ docker-compose down
 docker-compose down -v
 ```
 
-## Quick start local and DB docker
+## Quick start local and DB
 
 # 1. Add Database Dependencies
 
 Add [postgres](https://www.postgresql.org/download/).
 
 Support [link](https://www.w3schools.com/postgresql/postgresql_install.php)
+
+[Node.js](https://nodejs.org/en) (v20 or later)
 
 # 2. Create your .env file
 
@@ -113,9 +117,11 @@ npm run install
 npm run build && npm run start
 ```
 
+# Usage
+
 # Access your api
 
-Your api will be exposed by default on port 3000.
+The API is available at http://localhost:3000 (or the port specified in your .env file).
 
 ```console
 http://localhost:3000
@@ -139,41 +145,48 @@ This file can be imported on [Postman](https://www.postman.com/) to easy iterati
 
 ## Stack
 
-- [NodeJS](https://nodejs.org/en)
-- [Hono](https://hono.dev/) (Web Framework)
-- [Swagger](https://swagger.io/) (Api Documentation)
-- [Postgres](https://www.postgresql.org/) (Database)
-- [Pino](https://github.com/pinojs/pino) (Logger)
-- [Zod](https://zod.dev/) (Schemma Validation)
+- [NodeJS](https://nodejs.org/en) (Runtime)
+- [Hono](https://hono.dev/) (Lightweight, high-performance web framework)
+- [Swagger](https://swagger.io/) (OpenAPI specification and interactive UI)
+- [Postgres](https://www.postgresql.org/) (Reliable, ACID-compliant relational database)
+- [Pino](https://github.com/pinojs/pino) (Ultra-fast Node.js logger)
+- [Zod](https://zod.dev/) (TypeScript-first schema validation)
 
 ## Architecture
 
-Opted for a clean and direct approach on functionality (Import and Export).
+The application follows a clean architecture approach with clear separation of concerns:
+
+- **Routes:** API endpoint definitions and request handling
+- **Services:** Business logic implementation
+- **Repositories:** Data access layer
+- **Models:** Data structures and validation schemas
+- **Utils:** Shared utility functions
+
+Processing of large datasets is handled through streaming and chunking to optimize memory usage and performance.
+
+### Performance Optimizations
+
+- **Batch Processing:** Database operations are performed in configurable batches
+- **Connection Pooling:** Database connections are reused for better performance
+- **Streaming:** File data is processed as streams to minimize memory usage
+- **Asynchronous Processing:** Long-running operations are handled asynchronously
 
 ## Tests
 
-Due to a lack of time, I wasn't able to generate tests in time.
+Due to time constraints, comprehensive test coverage is not yet implemented. Future development should prioritize:
+
+- Unit tests for core business logic
+- Integration tests for API endpoints
+- Performance tests for data processing pipelines
 
 ## Challenge limitations
 
-### Endpoint
+- **Export Job Retrieval:** The /v1/exports/{job_id} endpoint is not implemented as it would require object storage (S3 or similar) for storing and retrieving large export files.
 
-The (/v1/exports/{job_id}) endpoint was not implemented.
-
-The reason was, to fulfill the requirements of this endpoint, I should have an s3 bucket available or similar.
-
-To upload the results and provide a valid download link.
-
-### Tables creation
-
-When creating the tables, since there was no description on the assignment on types for each field.
-
-I took the liberty to check the samples of data provided for testing, to find a possible pattern to guide me.
-
-But since I can't control what is coming from a partner, I opt for not restricting the Ids as uuid.
+- **Schema Flexibility:** Database schemas are designed to be flexible based on sample data, without strict type constraints on IDs to accommodate various partner data formats.
 
 ## Final comments
 
-I had a good time doing this.
+This project demonstrates efficient handling of large-scale data import/export operations with a focus on performance and reliability. The architecture provides a solid foundation for further enhancements and feature additions.
 
-Learned a lot o things, and refreshed a few old concepts.
+Feedback and contributions are welcome!
