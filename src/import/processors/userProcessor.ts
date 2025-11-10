@@ -3,7 +3,6 @@ import { createInterface } from "node:readline";
 import { setTimeout } from "node:timers/promises";
 import { fileURLToPath } from "url";
 import { isMainThread, workerData } from "worker_threads";
-import z from "zod";
 import { log } from "../../utils/logger.js";
 import { QueueStatusType } from "../models/import.js";
 import { User, UserSchema } from "../models/user.js";
@@ -14,12 +13,11 @@ export const userWorker = fileURLToPath(import.meta.url);
 
 class HighProcessor {
   private data: Array<User> = [];
-  private bufferLimit = 100;
+  private bufferLimit = 1000;
   private userRepository = new UserRepository();
   private jobRepository = new JobRepository();
   private errorCounter = 0;
   private successCounter = 0;
-  private lineCounter = 0;
 
   constructor(private jobKey: string) {}
 
@@ -32,7 +30,6 @@ class HighProcessor {
   }
 
   async add(line: string) {
-    this.lineCounter++;
     const validLine = this.parseLine(line);
     if (validLine === null) {
       this.errorCounter++;
@@ -46,6 +43,7 @@ class HighProcessor {
         this.successCounter += counter;
         this.errorCounter += this.bufferLimit - counter;
       });
+
       this.reset();
     }
   }
@@ -59,24 +57,17 @@ class HighProcessor {
         email: tokens[1],
         name: tokens[2],
         role: tokens[3],
-        active: new Boolean(tokens[4]).valueOf(),
+        active: ["true", "yes", "1", "y"].includes(tokens[4].toLowerCase()),
         created_at: new Date(tokens[5]),
         updated_at: new Date(tokens[6]),
       };
 
       return UserSchema.parse(obj);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        log().error(
-          { jobKey: this.jobKey, errors: error.issues },
-          "Error parsing user line"
-        );
-      } else {
-        log().error(
-          { jobKey: this.jobKey, errors: (error as Error).message },
-          "Error parsing user line"
-        );
-      }
+      log().error(
+        { jobKey: this.jobKey, errors: (error as Error).message },
+        "Error parsing user line"
+      );
       return null;
     }
   }

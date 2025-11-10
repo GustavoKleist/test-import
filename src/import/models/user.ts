@@ -18,7 +18,6 @@ export const UserSchema = z
       .describe("Role of the user within the system"),
     active: z
       .boolean()
-      .default(true)
       .describe("Indicates whether the user account is active"),
     created_at: z
       .date()
@@ -32,6 +31,10 @@ export const UserSchema = z
   .refine((data) => data.name.trim().length > 0, {
     message: "Name cannot be just whitespace",
     path: ["name"],
+  })
+  .refine((data) => data.active === true, {
+    message: "User must be active",
+    path: ["active"],
   });
 
 export type User = z.infer<typeof UserSchema>;

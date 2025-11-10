@@ -14,7 +14,7 @@ export const commentsWorker = fileURLToPath(import.meta.url);
 
 class HighProcessor {
   private data: Array<Comment> = [];
-  private bufferLimit = 100;
+  private bufferLimit = 1000;
   private commentRepository = new CommentRepository();
   private jobRepository = new JobRepository();
   private errorCounter = 0;
