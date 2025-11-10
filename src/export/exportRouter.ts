@@ -94,8 +94,25 @@ const exportContentPost = createRoute({
       content: {
         "multipart/form-data": {
           schema: {
-            type: "string",
-            format: "string",
+            type: "object",
+            properties: {
+              resource: {
+                type: "string",
+                enum: ["users", "articles", "comments"],
+                description: "Type of content to export",
+              },
+              format: {
+                type: "string",
+                enum: ["ndjson"],
+                default: "ndjson",
+                description: "Output format of the export file",
+              },
+            },
+            required: ["resource", "format"],
+            example: {
+              resource: "users",
+              format: "ndjson",
+            },
           },
         },
       },
